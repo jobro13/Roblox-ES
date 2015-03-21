@@ -86,8 +86,8 @@ get_ver()
 {
 if test -d $src_dir/$1-$2
 then
-echo "-----> Using $1 $2"
-install_$1
+echo "-----> Already installed  $1 $2"
+#install_$1
 else
 mkdir -p $src_dir/$1-$2
 cd $src_dir/$1-$2
