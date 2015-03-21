@@ -1,10 +1,14 @@
 #!/bin/bash
 source $OPENSHIFT_CARTRIDGE_SDK_BASH
 
-# The logic to stop your application should be put in this script.
-if [ -z "$(ps -ef | grep testrubyserver.rb | grep -v grep)" ]
-then
-    client_result "Application is already stopped"
-else
-    kill `ps -ef | grep testrubyserver.rb | grep -v grep | awk '{ print $2 }'` > /dev/null 2>&1
-fi
+echo "Stopping nginx"
+
+VERSION=1.7.2.1
+
+APPROOT=~/app-root/repo/usr/$VERSION
+export LD_LIBRARY_PATH=$APPROOT/luajit/lib
+
+LAPIS=$APPROOT/rocks/bin
+NGINX=$APPROOT/sbin/nginx
+
+eval "'$NGINX' -c '$LAPIS/nginx.conf' -s stop"

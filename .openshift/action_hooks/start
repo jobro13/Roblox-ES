@@ -2,4 +2,18 @@
 # The logic to start up your application should be put in this
 # script. The application will work only if it binds to
 # $OPENSHIFT_DIY_IP:8080
-nohup $OPENSHIFT_REPO_DIR/diy/testrubyserver.rb $OPENSHIFT_DIY_IP $OPENSHIFT_REPO_DIR/diy |& /usr/bin/logshifter -tag diy &
+#nohup $OPENSHIFT_REPO_DIR/diy/testrubyserver.rb $OPENSHIFT_DIY_IP $OPENSHIFT_REPO_DIR/diy |& /usr/bin/logshifter -tag diy &
+
+VERSION=1.7.2.1
+
+APPROOT=~/app-root/repo/usr/$VERSION
+export LD_LIBRARY_PATH=$APPROOT/luajit/lib
+
+LAPIS=$APPROOT/rocks/bin
+NGINX=$APPROOT/sbin/nginx
+
+
+echo "Starting Server"
+
+nohup "$NGINX" -c "$LAPIS/nginx.conf"
+
