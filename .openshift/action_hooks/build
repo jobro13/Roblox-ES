@@ -50,7 +50,7 @@ build_LuaRocks()
 {
 echo " Building LuaRocks"
 cd $src_dir/LuaRocks-$luarocks_ver/luarocks-$luarocks_ver/
-./configure --prefix=$install_dir --with-lua=$install_dir/luajit --sysconfdir=$install_dir --rocks-tree=$install_dir/rocks --force-config
+./configure --prefix=$install_dir --with-lua=$install_dir/luajit --sysconfdir=$install_dir/etc/luarocks --rocks-tree=$install_dir/rocks --force-config
 make
 }
 install_LuaRocks()
@@ -58,9 +58,17 @@ install_LuaRocks()
 cd $src_dir/LuaRocks-$luarocks_ver/luarocks-$luarocks_ver/
 make DESTDIR=$install_dir/ install
 #luarocks_config $install_dir
-ln -sf $install_dir/etc/luarocks/config-5.1.lua $install_dir/etc/luarocks/config.lua
+#ln -sf $install_dir/etc/luarocks/config-5.1.lua $install_dir/etc/luarocks/config.lua
 mv $install_dir/bin/luarocks $install_dir/bin/luarocks-main
 ln -s $install_dir/share/lua/5.1/luarocks $install_dir/bin/luarocks
+# OKAY, WHAT THE FUCK!?
+# In order to force to make LuaRocks NOT MAKE .CACHE INTO $HOME (what we did NOT CONFIGURE) we have to overwrite the HOME variable.. WTF!? 
+cd $install_dir/bin
+mkdir -p $install-dir/etc/luarocks
+cat "rocks_trees = { { name = [[system]], root = [[/var/lib/openshift/550d96904382ecc42200010f/app-root/repo/usr/1.7.2.1/rocks]] }}" >> $install-dir/etc/luarocks/config.lua 
+HOME=$install_dir # !??!?!?!?! (check Luarocks cfg.lua... explicitly os.getenv HOME ...)
+./luarocks-5.1 install luasocket
+./luarocks-5.1 install lfs
 }
 # Arguments:
 # Name
