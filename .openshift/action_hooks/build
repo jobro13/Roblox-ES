@@ -1,5 +1,5 @@
 #!/bin/bash -e
-source "lib/util"
+#source "lib/util"
 # This is the OpenResty setup
 set -eo pipefail
 version=${OPENRESTY_VERSION:-1.7.2.1}
