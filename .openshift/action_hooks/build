@@ -1,4 +1,5 @@
 #!/bin/bash -e
+# COPIED FROM https://github.com/losinggeneration/openshift-lapis-cartridge/blob/master/.openshift/action_hooks/build (NO LICENSE FOUND)
 #source "lib/util"
 # This is the OpenResty setup
 set -eo pipefail
@@ -58,6 +59,9 @@ cd $src_dir/LuaRocks-$luarocks_ver/luarocks-$luarocks_ver/
 make DESTDIR=$install_dir/ install
 #luarocks_config $install_dir
 ln -sf $install_dir/etc/luarocks/config-5.1.lua $install_dir/etc/luarocks/config.lua
+mv luarocks luarocks-main
+mkdir luarocks
+ln -s $install_dir/share/lua/5.1/luarocks luarocks
 }
 # Arguments:
 # Name
@@ -87,3 +91,5 @@ mkdir -p $src_dir
 get_ver "PCRE" "$pcre_ver" "$pcre_url" "$pcre_file"
 get_ver "OpenResty" "$openresty_ver" "$openresty_url" "$openresty_file"
 get_ver "LuaRocks" "$luarocks_ver" "$luarocks_url" "$luarocks_file"
+
+
