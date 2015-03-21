@@ -49,6 +49,8 @@ ln -sf $install_dir/luajit/include/luajit-*/* $install_dir/luajit/include/
 build_LuaRocks()
 {
 echo " Building LuaRocks"
+echo $install_dir
+sleep 1
 cd $src_dir/LuaRocks-$luarocks_ver/luarocks-$luarocks_ver/
 ./configure --prefix=$install_dir --with-lua=$install_dir/luajit --sysconfdir=$install_dir/etc/luarocks --rocks-tree=$install_dir/rocks --force-config
 make
