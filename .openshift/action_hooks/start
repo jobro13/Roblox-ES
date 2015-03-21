@@ -10,8 +10,9 @@ APPROOT=~/app-root/repo/usr/$VERSION
 export LD_LIBRARY_PATH=$APPROOT/luajit/lib
 
 LAPIS=$APPROOT/rocks/bin
-NGINX=$APPROOT/sbin/nginx
+NGINX=$APPROOT/nginx/sbin/nginx
 
+export PORT=8080
 
 echo "Starting Server"
 
