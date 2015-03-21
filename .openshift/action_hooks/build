@@ -1,3 +1,14 @@
 #!/bin/bash
 
-echo 'hello'
+LUAROCKS_VERSION=2.2.1
+
+if test -a luarocks-$LUAROCKS_VERSION
+then
+	echo "Downloading LuaRocks $LUAROCKS_VERSION"
+	LUAROCKS_DOWNLOAD_URL=http://keplerproject.github.io/luarocks/releases/${LUAROCKS_VERSION}.tar.gz
+	wget http://keplerproject.github.io/luarocks/releases/luarocks-$LUAROCKS_VERSION.tar.gz
+	echo "Extracting LuaRocks"
+	tar -xzf luarocks-${LUAROCKS_VERSION}.tar.gz
+	cd luarocks-${LUAROCKS_VERSION}
+fi
+
