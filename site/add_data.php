@@ -10,8 +10,7 @@
 		$data = gzdecode($data);
 	}
 	$data = json_decode($data, true);
-	$JobId = $data['JobId'];
-	echo $JobId;
+	$JobId = mysql_real_escape_string($data['JobId']);
 	$query = "SELECT id FROM SERVERS WHERE job_id = '$JobId'";
 	$id = mysql_query($query, $conn);
 	$id = mysql_result($id, 0);
@@ -40,8 +39,32 @@
 	$retval = mysql_query("UPDATE SERVERS SET last_activity=null WHERE id=$id", $conn);
 	if (! $retval) {
 		echo("Could not update: " . mysql_error());
-	}	
-	echo $id;
-	foreach($data as $key => $value) {
+	}
+	foreach($data as $type => $value) {
+		if ($type != 'JobId') {
+			foreach($value as $index => $field) {
+				// Type chat ->
+				if ($type == 'Chats') {
+					$userid = $field['UserId'];
+					$playername = mysql_real_escape_string($field['PlayerName']);
+					$chatstring = mysql_real_escape_string($field['ChatString']);
+					$timestamp = $field['Timestamp'];
+					$inschat = "INSERT INTO `CHAT$id` (userid, playername, chatstring, timestamp) VALUES ($userid, '$playername', '$chatstring', FROM_UNIXTIME($timestamp));";
+					$result = mysql_query($inschat, $conn);
+					if (! $result) {
+						echo( "Something went wrong: " . mysql_error());
+					} 
+				} elseif ($type == 'Events') {
+					$event = mysql_real_escape_string($field['Event']);
+					$timestamp = $field['Timestamp'];
+					$insevent = "INSERT INTO EVENT$id (event, timestamp) VALUES ('$event', FROM_UNIXTIME($timestamp));";
+					$result = mysql_query($insevent, $conn); 
+					if (! $result) {
+						echo(" Something went wrong: " . mysql_error());
+					}
+				}
+				// For expansion, add more types here!!
+			}
+		}
 	}
 ?>
