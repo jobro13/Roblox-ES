@@ -1,8 +1,7 @@
-<<<<<<< HEAD
-The OpenShift `diy` cartridge documentation can be found at:
-
-http://openshift.github.io/documentation/oo_cartridge_guide.html#diy
-=======
 # RobloxEvents
-Send HTTP events to a server and show them there.
->>>>>>> 733b15f26ca7e562808576ddda090d4e32d1aa74
+Send HTTP events to a server and show them there. Stores data in a MySQL database.
+
+## Installation
+Install the following packages: apache2, mysql-client, mysql-server. 
+Run ./setup.sh PWD where PWD is the password of the mysql root user.
+
