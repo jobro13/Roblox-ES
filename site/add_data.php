@@ -24,6 +24,17 @@
 		}
 		$id = mysql_query($query, $conn);
 		$id = mysql_result($id, 0);
+		// Create tables for chat and events
+		$mkchatq = "CREATE TABLE `CHAT$id` (`num` BIGINT UNSIGNED UNIQUE NOT NULL AUTO_INCREMENT, `userid` BIGINT NOT NULL, `playername` VARCHAR(30) NOT NULL, `chatstring` TEXT NOT NULL, `timestamp` TIMESTAMP NOT NULL, PRIMARY KEY (`num`));";
+		$result = mysql_query($mkchatq, $conn);
+		if (! $result) {
+			echo ("Something went wrong: " . mysql_error());
+		}
+		$mkevtq = "CREATE TABLE `EVENT$id` (`num` BIGINT UNSIGNED UNIQUE NOT NULL AUTO_INCREMENT, `event` TEXT NOT NULL, `timestamp` TIMESTAMP NOT NULL, PRIMARY KEY (`num`));";
+		$result = mysql_query($mkevtq, $conn);
+		if (! $result){
+			echo("Something went wrong: " . mysql_error());
+		}
 	}
 	// Call update (kinda haxy, but ye, k thx sql only update when rly update
 	$retval = mysql_query("UPDATE SERVERS SET last_activity=null WHERE id=$id", $conn);
