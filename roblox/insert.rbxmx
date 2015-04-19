@@ -1,0 +1,167 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Script" referent="RBX88d76313ad394feab728d11d865b6ca0">
+		<Properties>
+			<bool name="Disabled">false</bool>
+			<Content name="LinkedSource"><null></null></Content>
+			<string name="Name">Example</string>
+			<ProtectedString name="Source"><![CDATA[RES = require(game.Workspace.ModuleScript)
+
+RES:Run()
+
+game.OnClose = function()
+	RES:Push()
+end
+
+while wait(5) do
+	-- Notice: server has builtin sql-injection protection.
+	RES:AddEvent("TestEvent, `DROP TABLE SERVERS`" .. math.random(1,10) .. " pls")
+	RES:AddChat("Test chat, " .. math.random(1,10) .. " qq",
+		{Name = "test", userId = 300})
+end
+
+-- Other uses: (note that this never runs in this script)
+
+game.Players.PlayerAdded:connect(function(p)
+	RES:AddEvent("A player joined: " .. p.Name)
+end)
+
+game.Players.PlayerRemoving:connect(function(p)
+	RES:AddEvent("A player left: " .. p.Name)
+end)]]></ProtectedString>
+		</Properties>
+	</Item>
+	<Item class="ModuleScript" referent="RBX001a25ad763a470d82175de00a39a3a7">
+		<Properties>
+			<Content name="LinkedSource"><null></null></Content>
+			<string name="Name">RobloxEvents</string>
+			<ProtectedString name="Source"><![CDATA[local RES = {}
+
+-- At runtime, just call RES:Run()
+-- For optimal, if game closes; call Res:Push() -> put this in game.OnClose 
+
+-- How long should RES wait until push?
+RES.DTime = 60; 
+RES.Host = "192.168.1.5"; -- Host to push to 
+--(NOTE: THIS IS A LAN HOST, SO NO NEED TO DDOS THIS, YOU ARE DDOSING YOUR OWN LAN, PROBABLY)
+RES.Target = "add_data.php"; -- Target URL to POST to.
+
+RES.Print = true
+-- Do not change anything below this line --
+
+RES.PushUrl = "http://" .. RES.Host .. "/" .. RES.Target 
+RES.EJson = game:GetService("HttpService").JSONEncode
+RES.HTTP = game:GetService("HttpService")
+
+function RES:Push()
+	self.PUSHING = true
+	if #self.Events.Chats > 0 or #self.Events.Events > 0 then
+		-- Can push.
+		-- Gen data;
+		local Data = self.EJson(self.HTTP, self.Events)
+		-- empty tables.
+		self.Events.Chats = {}
+		self.Events.Events = {} 
+		self.PUSHING = false -- okay to add new stuff.
+
+		pcall(function() 
+		local data = self.HTTP:PostAsync(self.PushUrl, Data, Enum.HttpContentType.TextPlain	)
+		if self.Print then
+			print(data)
+		end
+		end)
+
+	end
+	self.PUSHING = false
+end 
+
+function RES:Run()
+	if self.RUNNING then
+		error("Thread is already running.")
+	end
+	self.RUNNING = true
+	self.Events = {
+		JobId = (game.JobId ~= "" and game.JobId) or "StudioServer";
+		Chats = {};
+		Events = {};	
+	}
+	delay(0, function()
+		while wait(self.DTime) do
+			self:Push()
+		end
+	end)
+end
+
+-- Puts a 
+function RES:AddChat(ChatStr, Player)
+	local PName = Player.Name;
+	local Puid = Player.userId;
+	local Data = {PlayerName = PName, UserId = Puid, ChatString = ChatStr, Timestamp = os.time()}
+	self:PutData(self.Events.Chats, Data)
+end
+
+function RES:AddEvent(Evt)
+	local Data = {Event = tostring(Evt), Timestamp = os.time()}
+
+	self:PutData(self.Events.Events, Data)
+end
+
+function RES:PutData(target_table, data)
+
+	delay(0, function()
+		while self.PUSHING do wait() end 
+		table.insert(target_table, data)
+	end)
+end
+
+return RES
+]]></ProtectedString>
+		</Properties>
+		<Item class="Script" referent="RBXc6847c115a97405f95b4789412c18bee">
+			<Properties>
+				<bool name="Disabled">true</bool>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">DOCS</string>
+				<ProtectedString name="Source"><![CDATA[-- ROBLOXEVENTS by jobro13 --
+c=[=[
+This small module is an interface to a server, running PHP and MySQL
+
+Variables, to set inside the module:
+DTime 		-> 	The target time to wait, until checking if new events or chats should be sent
+Host 		-> 	Target host. Should not include http://, just the IP or the hostname, such as google.com
+Target		-> 	Actual target file. Can be used for a very low level of protection, as no one can 
+				actually enter data without knowing /where/ to enter the data. 
+				Change this accordingly, but don't forget to do so on the server too.
+Print		-> 	This boolean tells RES if it should Print the returned values from PostAsync. True, by default, prints the returned data.
+				
+Methods
+	First of all, note that requiring the module, per definition, always returns the same table
+	This means that from whatever script you require this from, you always get the same interface.
+	You can also, of course, set a global variable in _G to point to this.
+	
+	The following methods are intended to be public. Calling other methods can cause strange side effects,
+	
+	void :Push()
+		Immediately try to push the buffers to the server. Main use for this is to be called on game.OnClose.
+		Does not spawn a new thread, thus yields until completed.		
+		
+	void :Run()
+		Starts the actual RobloxEvent thread, which checks every DTime seconds if events could be pushed
+		
+	void :AddChat(string ChatStr, player Player)
+		Adds a Chat event to the buffer. Player can also be a pseudo-object, this should be a table with at least the "Name" and "userId" fields set, accordingly.
+		
+	void :AddEvent(string Event)
+		Adds an Event to the buffer.
+		
+Notes
+	It is not necessary to :Run() prior to Adding any data. It's also possible to manually :Push() the buffer.
+	Protection is included when :Push() runs - no data is lost. Adding any event type actually spawns a new thread, which waits until it is okay to actually add these events.  
+
+	The server auto-sorts events based on timestamps. 
+]=]]]></ProtectedString>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>
