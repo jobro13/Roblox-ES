@@ -2,4 +2,4 @@
 
 PWD=$1
 
-mysql ROBLOX < create.sql -u root -p $PWD
+mysql ROBLOX < create.sql -u root -p$PWD
