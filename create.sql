@@ -1,2 +1,2 @@
-create table IF NOT EXISTS `SERVERS` (`job_id` VARCHAR(72) NOT NULL, `last_activity` DATETIME NOT NULL, PRIMARY KEY (`job_id`))
+create table `SERVERS` (`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, `job_id` VARCHAR(72) NOT NULL, `last_activity` TIMESTAMP NOT NULL, PRIMARY KEY (`id`))
 	
