@@ -5,7 +5,10 @@
 	<body>
 		<?php 
 		include "db.php";
-		phpinfo(); 
+		echo $dbuser;
+		echo $dbpasswd;
+		echo "test";
+		phpinfo();
 		?>
 	</body>
 </html>
