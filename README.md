@@ -22,20 +22,37 @@ Now, to add the user which will update the database:
 
 ## In-depth
 
+### Get packages
 Use your package manager to install the packages listed above. For debian and ubuntu, you use apt-get.
+
+### MySQL setup
 Login to mysql: `mysql -u root -p`. -u is the user switch. -p is a password switch
+
 Create a new user inside the mysql prompt:
+
 `CREATE USER 'roblox'@'localhost' IDENTIFIED BY 'password'` 
+
 Where roblox is the username you use for Roblox-ES and password the password.
+
 Create a roblox database (also in mysql):
+
 `CREATE DATABASE ROBLOX;`
+
 Grant privileges to the user:
+
 `GRANT ALL PRIVILEGES ON ROBLOX . * TO 'roblox'@'localhost';`
+
 Make sure that 'roblox' is the username you want to use here.
+
 Now revoke the 'grant permission' and 'drop' (delete) permissions. This is for safety.
+
 `REVOKE DROP ON ROBLOX . * FROM 'roblox'@'localhost';`
+
 `REVOKE GRANT PRIVILEGES ON ROBLOX . * FROM 'roblox'@'localhost';`
+
 Now quit mysql. Run setup.sh. This setups the initial server table.
+
+### Setup apache and php
 
 Find the apache configuration and the sites-enabled. Change the DocumentRoot in this configuration to the ./site directory here. 
 
