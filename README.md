@@ -17,3 +17,46 @@ Now, to add the user which will update the database:
 *	Open roblox and input the model. Read it's README and setup the right options.
 *	(Re)start apache.
 *	Fun.
+
+
+
+## In-depth
+
+Use your package manager to install the packages listed above. For debian and ubuntu, you use apt-get.
+Login to mysql: `mysql -u root -p`. -u is the user switch. -p is a password switch
+Create a new user inside the mysql prompt:
+`CREATE USER 'roblox'@'localhost' IDENTIFIED BY 'password'` 
+Where roblox is the username you use for Roblox-ES and password the password.
+Create a roblox database (also in mysql):
+`CREATE DATABASE ROBLOX;`
+Grant privileges to the user:
+`GRANT ALL PRIVILEGES ON ROBLOX . * TO 'roblox'@'localhost';`
+Make sure that 'roblox' is the username you want to use here.
+Now revoke the 'grant permission' and 'drop' (delete) permissions. This is for safety.
+`REVOKE DROP ON ROBLOX . * FROM 'roblox'@'localhost';`
+`REVOKE GRANT PRIVILEGES ON ROBLOX . * FROM 'roblox'@'localhost';`
+Now quit mysql. Run setup.sh. This setups the initial server table.
+
+Find the apache configuration and the sites-enabled. Change the DocumentRoot in this configuration to the ./site directory here. 
+
+The last thing to do is to create a file called db.php inside any of php's include dirs. You can find the include_dirs by create a file inside site, which has the following contents;
+`<?php	
+	phpinfo()
+?>`
+
+If you restart apache (apachectl restart, maybe needs root, so sudo) and go to this page, you will get the php configuration which also shows the include_dirs. You can also edit the configuration file (location is also on this page) and edit the include_dir locations there.
+Now create this db.php file. This are the contents:
+
+`<?php
+	$db_user = "roblox";
+	$db_passwd = "password";
+?>`
+
+The pages will read the user and password from this directory. Like this, it is not publicly exposed, if it resides on a safe place.
+
+Now restart apache. (apachectl restart)
+
+Insert the model inside roblox. Read the ReadME and configure it. Try starting a test server on your local LAN with a test script in it. Now check if the data actually gets added to the site.
+
+You can then upload it to roblox. If external servers cannot reach your server, you have to port forward your apache http port (for this job) to a public port (80 is default). To do this, refer to your router manual.
+
