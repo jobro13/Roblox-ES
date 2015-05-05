@@ -14,6 +14,7 @@
 	$query = "SELECT id FROM SERVERS WHERE job_id = '$JobId'";
 	$id = mysql_query($query, $conn);
 	$id = mysql_result($id, 0);
+	$tweet = False;
 	if (empty($id)) {
 		// No ID found, so pls, lets make this.
 		$iquery = "INSERT INTO SERVERS (job_id) VALUES ('$JobId')";
@@ -34,6 +35,8 @@
 		if (! $result){
 			echo("Something went wrong: " . mysql_error());
 		}
+		// NEW: TWEET
+		$tweet = True; 
 	}
 	// Call update (kinda haxy, but ye, k thx sql only update when rly update
 	$retval = mysql_query("UPDATE SERVERS SET last_activity=null WHERE id=$id", $conn);
@@ -66,5 +69,16 @@
 				// For expansion, add more types here!!
 			}
 		}
+	}
+    	require("twitter.php");
+        require ("twitteroauth/autoload.php");
+
+	use Abraham\TwitterOAuth\TwitterOAuth;
+	// Tweet here.
+
+	if ($tweet) {
+        $connection = new TwitterOAuth($twitter_consumer_key, $twitter_consumer_secret, $twitter_access_token, $twitter_access_secret);
+        $content = $connection->get("account/verify_credentials");
+        $statues = $connection->post("statuses/update", array("status" => "A new Stranded server came online!"));
 	}
 ?>
